@@ -75,16 +75,50 @@ Choose the $k$ that minimizes $IC(k)$ to be the estimate of $m$.
 
 ---
 
-## Implementation
+## Algorithm & Implementation
 
 Optimal number of latent factors is estimated by:
 
 Latent factors are estimated by sparse-PCA via a hard-thresholding:
 
+```text
+Input:
+    - R: T × N return matrix
+    - $\hat{m}$: number of sparse principal components
+
+1. Compute the SVD of R:
+       R = U D V^T.
+
+2. Initialise
+       A = [a_1, ..., a_{\hat{m}}] = V[:, 1:\hat{m}].
+
+3. Repeat until convergence:
+       for j = 1, ..., \hat{m}:
+           \tilde{b}_j = D_j R^T R \tilde{a}_j
+       end for
+
+       Form
+           \tilde{B} = [\tilde{b}_1, ..., \tilde{b}_{\hat{m}}].
+
+       Compute the SVD
+           R^T R \tilde{B} = \tilde{U} \tilde{D} \tilde{V}^T.
+
+       Update
+           A = \tilde{U} \tilde{V}^T.
+
+4. For j = 1, ..., \hat{m}, set
+       \tilde{\lambda}_{j,spca} = \tilde{b}_j / ||\tilde{b}_j||.
+
+Output:
+       \tilde{\Lambda}_{spca} = [\tilde{\lambda}_{1,spca}, ..., \tilde{\lambda}_{\hat{m},spca}].
+```
+
+
+
 Optimaization program is solved using [Gurobi R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html).
 
 
-The algorithm is implemented in R, and then applied to the European stock market on a **rolling-window scheme**:
+The smart alpha portfolio selection algorithm is implemented in R, and then applied to the European stock market on a **rolling-window scheme**:
 - Stock Universe: constituents of the **STOXX Europe 600** index, with ticker scrapped from DividendMax and data downloaded from python library [`yfinance`](https://pypi.org/project/yfinance/).
 - Use daily returns from 2015-01 to 2021-12.
 - Window length is 13 months (12 months for training and 1 month for out-of-sample testing), each iteration moves forward by 1 month.
@@ -93,17 +127,53 @@ The algorithm is implemented in R, and then applied to the European stock market
 
 ## Empirical Findings
 
+Portfolio is evaluated considering: **return**, **volatility**, **Sharpe ratio**, **drawdown in crash periods**, **beta**, **alpha**, **residual risk**, **excess return**, and **appraisal ratio**. Followed [Boucher et al., 2021](#boucher2021),I reproduced the main empiracal results with some additional robustness checks and extensions:
 
+- The optimal number of dynamic factors is typically **2–4**, and this number tends to **increase at the beginning of crisis periods**.
+- **Sparse-PCA** produces significantly better dynamic factors than standard PCA in this setting, although it is more computationally expensive.
+- Sparsity, jointly controlled by the **number of factors** and the **hard-thresholding level**, has a **non-monotonic** effect on performance: as sparsity increases, performance firstly decreases, then improves and reaches to maximum, and finally deteriorates again when the model becomes too sparse.
+- A “greedy” choice of a high alpha lower bound $\varepsilon$ can lead to **lower realised alpha** out of sample. In my experiments, the best portfolios are often obtained when **alpha is left unconstrained or only mildly constrained**.
 
 ---
 
 ## Repository Structure
 
+```text
+.
+├── data/                     # Processed STOXX600 return data (or example data)
+├── R/
+│   ├── 01_factor_selection.R
+│   ├── 02_sparse_pca.R
+│   ├── 03_optimisation.R
+│   ├── 04_backtest.R
+│   └── utils.R
+├── python/
+│   └── download_data.py      # yfinance download script
+├── results/
+│   ├── performance_summary.csv
+│   └── factor_diagnostics.csv
+├── figures/
+│   ├── cumulative_returns.png
+│   ├── drawdowns.png
+│   └── num_factors_over_time.png
+└── README.md
+```
+
+Note, Due to data size and licensing considerations, I do **not** distribute the full dataset in this repository. Instead, I provide:
+
+- A list of STOXX600 tickers and exchanges (`data/tickers_stoxx600.csv`),
+- A small example return panel (`data/example_returns.csv`) to illustrate
+  the required input format, and
+- A Python script (`python/download_data.py`) that downloads price data
+  from Yahoo! Finance using `yfinance`.
+  
+Users can reproduce or extend my empirical analysis by running the download script with their preferred sample period (e.g. updating the data up to the current date).
+
 ---
 
 ## Original Paper
 <a id="boucher2021"></a>
-**Boucher, C., Jasinski, A., Kouontchou, P., & Tokpavi, S. (2021).##
+**Boucher, C., Jasinski, A., Kouontchou, P., & Tokpavi, S. (2021).**
 Smart Alpha: active management with unstable and latent factors.
 *Quantitative Finance, 21(6), 893–909.*
 
