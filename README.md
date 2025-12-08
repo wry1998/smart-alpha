@@ -140,34 +140,31 @@ Portfolio is evaluated considering: **return**, **volatility**, **Sharpe ratio**
 
 ```text
 .
-├── data/                     # Processed STOXX600 return data (or example data)
-├── R/
-│   ├── 01_factor_selection.R
-│   ├── 02_sparse_pca.R
-│   ├── 03_optimisation.R
-│   ├── 04_backtest.R
-│   └── utils.R
-├── python/
-│   └── download_data.py      # yfinance download script
-├── results/
-│   ├── performance_summary.csv
-│   └── factor_diagnostics.csv
-├── figures/
-│   ├── cumulative_returns.png
-│   ├── drawdowns.png
-│   └── num_factors_over_time.png
+├── 01_python/                     # Data download
+│   ├── 01_scrap_ticker.py         # Scrap STOXX600 component stocks' ticker and exchange
+│   └── 02_download_data.py        # Download STOXX600 price data via yfinance
+│
+├── 02_R/                          # R implementation of the Smart Alpha model
+│   ├── 01_SPCA&PCA.R              # Choice of dynamic factor number, sparse-PCA/PCA process of selecting dynamic factors
+│   ├── 02_main_function.R         # Iteratively compute smart-alpha portfolio and evaluate it's performance on a rolling window process
+│   └── 03_emprical_result.R       # Load data and generate results
+│
+├── 03_data/                       # Data folder
+│   ├── raw_data/                  # Examples of raw stock data
+│   ├── settle_list.csv            # exchange
+│   └── ticker_list.csv            # ticker
+│
+├── .gitignore                     # Ignore rules for R history, etc.
 └── README.md
 ```
 
-Note, Due to data size and licensing considerations, I do **not** distribute the full dataset in this repository. Instead, I provide:
+Note, Due to data size, I do **not** distribute the full dataset in this repository. Instead, I provide:
 
-- A list of STOXX600 tickers and exchanges (`data/tickers_stoxx600.csv`),
-- A small example return panel (`data/example_returns.csv`) to illustrate
-  the required input format, and
-- A Python script (`python/download_data.py`) that downloads price data
-  from Yahoo! Finance using `yfinance`.
+- A list of STOXX600 tickers and exchanges,
+- A small example return panel to illustrate the required input format, and
+- A Python script that downloads price data from Yahoo Finance using `yfinance`.
   
-Users can reproduce or extend my empirical analysis by running the download script with their preferred sample period (e.g. updating the data up to the current date).
+Users can reproduce or extend my empirical analysis by running the program files in order with their preferred sample period.
 
 ---
 
