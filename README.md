@@ -191,3 +191,6 @@ In *IEEE International Conference on Acoustics, Speech and Signal Processing (IC
 **Bai, J., & Ng, S. (2002).**  
 Determining the number of factors in approximate factor models.  
 *Econometrica*, 70(1), 191–221.
+
+---
+*For an overview of my research projects, see my [research portfolio](https://github.com/wry1998/research-portfolio).*
