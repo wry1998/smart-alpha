@@ -151,8 +151,11 @@ Portfolio is evaluated considering: **return**, **volatility**, **Sharpe ratio**
 │
 ├── 03_data/                       # Data folder
 │   ├── raw_data/                  # Examples of raw stock data
-│   ├── settle_list.csv            # exchange
-│   └── ticker_list.csv            # ticker
+│   ├── settle_list.csv            # Exchange
+│   └── ticker_list.csv            # Ticker
+│
+├── 04_report/                       
+│   └── report.pdf                 # Final report
 │
 ├── .gitignore                     # Ignore rules for R history, etc.
 └── README.md
