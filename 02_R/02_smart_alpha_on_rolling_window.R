@@ -44,7 +44,7 @@ rolling_spca = function(data, rho, eplison){
     R_test = data[((n+12)*21+1):((n+12)*21+21),] ## test
     
     ## compute weight
-    m = m_opt(R,4)
+    m = m_opt(R,10)   # set mmax to be 10 rather than 50 to save running time, as optimal is usually 2-4
     spca = SPCA(rho,R,m)
     weight_new = opt(spca,eplison)
     turnover = turnover+sum(abs(weight_new-weight_old)) #turnover
@@ -75,7 +75,7 @@ rolling_pca = function(data, eplison){
     R_test = data[((n+12)*21+1):((n+12)*21+21),] ## test
     
     ## compute weight
-    m = m_opt(R,4)
+    m = m_opt(R,10)   # set mmax to be 10 rather than 50 to save running time, as optimal is usually 2-4
     spca = PCA(R,m)
     weight_new = opt(spca,eplison)
     turnover = turnover+sum(abs(weight_new-weight_old)) #turnover

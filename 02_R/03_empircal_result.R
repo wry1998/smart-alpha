@@ -66,13 +66,13 @@ data[is.na(data)] = 0   # replace NA with 0 (i.e. assume price stays the same)
 rolling_m = function(data){
   t = dim(data)[1]
   N = dim(data)[2]
-  month = floor(t/21) ## number of trading month in dataset
+  month = floor(t/21) # number of trading month in dataset
   
   return = c()
   optimal_m = c()
   for(n in 0:(month-13)){
     R = data[(n*21+1):((n+12)*21),] ## train
-    m = m_opt(R,10)
+    m = m_opt(R,10)  # set mmax to be 10 rather than 50 to save running time, as optimal is usually 2-4
     optimal_m[n+1] = m
   }
   return(optimal_m)
