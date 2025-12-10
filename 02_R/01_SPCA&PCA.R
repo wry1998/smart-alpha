@@ -16,7 +16,7 @@ m_opt = function(data,mmax){        # mmax is the maximum optimal number possibl
     
     V = sum(error^2)/t/N
     C_TN = min(sqrt(N),sqrt(t))
-    IC[m] = log(V)#+m*(N+t)/N/t
+    IC[m] = log(V)+m*(N+t)/N/t
   }
   IC = IC[-1]
   optimal = which.min(IC)+1
