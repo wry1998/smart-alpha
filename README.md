@@ -77,48 +77,65 @@ Choose the $k$ that minimizes $IC(k)$ to be the estimate of $m$.
 
 ## Algorithm & Implementation
 
-Optimal number of latent factors is estimated by:
-
-Latent factors are estimated by sparse-PCA via a hard-thresholding:
+Optimal number of latent factors, $m$, is estimated as follows:
 
 ```text
 Input:
-    - R: T × N return matrix
-    - $\hat{m}$: number of sparse principal components
+- R: T × N return matrix (N stocks, T daily returns)
+- mmax: an interger specify the upper bound of m
 
-1. Compute the SVD of R:
-       R = U D V^T.
+Algorithm:
+(U,V,D) <-- svd(R,mmax)
+LC <-- a null vector of length mmax-1
+FOR k = 2,...,mmax DO:
+    (U_m,V_m,D_m) <-- first m components of the SVD decomposition of R
+    F <-- normalized(U_m %*% D_m)
+    Lambda <-- (R' %*% F)/T
+    E <-- R - F %*% Lambda'
+    V <-- sum(E_tn^2)/(TN)
+    IC[k-1] <-- ln(V)+k(N+T)/(NT)ln(min{sqrt(N),sqrt(T)})
+END
+m_optimal <- m such that the corresponding IC is minimized
 
-2. Initialise
-       A = [a_1, ..., a_{\hat{m}}] = V[:, 1:\hat{m}].
-
-3. Repeat until convergence:
-       for j = 1, ..., \hat{m}:
-           \tilde{b}_j = D_j R^T R \tilde{a}_j
-       end for
-
-       Form
-           \tilde{B} = [\tilde{b}_1, ..., \tilde{b}_{\hat{m}}].
-
-       Compute the SVD
-           R^T R \tilde{B} = \tilde{U} \tilde{D} \tilde{V}^T.
-
-       Update
-           A = \tilde{U} \tilde{V}^T.
-
-4. For j = 1, ..., \hat{m}, set
-       \tilde{\lambda}_{j,spca} = \tilde{b}_j / ||\tilde{b}_j||.
-
-Output:
-       \tilde{\Lambda}_{spca} = [\tilde{\lambda}_{1,spca}, ..., \tilde{\lambda}_{\hat{m},spca}].
+Output: m_optimal
 ```
 
+For a given $m$, Latent factors are estimated by sparse-PCA via a hard-thresholding, and the $\alpha$ and $\Sigma_S$ in the optimization problem follows:
 
+```text
+Input:
+- R: T × N return matrix
+- m: number of sparse principal components
+- rho: hard threshold chosen between (0,1) to decided if 2 stocks are correlated
 
-Optimaization program is solved using [Gurobi R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html).
+Algorithm:
+FOR i=1,...,N; j=1,...N DO
+    H[ij] <-- IF cor(R[i],R[j]) >= rho THEN 1 ELSE 0
+END
+UPDATE H <-- rearrange columns (h_1,...,h_N) such that var(h_1) >= ... >= var(h_N)
+(U,V,D) <-- svd(R,m)  
+(a_1,...a_m) <-- V
+REPEAT until convergence:
+    FOR j = 1, ...,m Do
+        D_j <-- diag(h_j,N)   ## use jth column of H to construct diagonal matrix 
+        b_j = D_j %*% R' %*% R %*% a_j
+    END
+    UPDATE B <-- (b_1,...,b_m)
+    X <-- R' %*% R %*% B
+    UPDATE (U,V,D) <-- svd(X,m) 
+    UPDATE (a_1,...a_m) <-- U %*% V'
+END
+Lambda <-- (norm(b_1),...,norm(b_m))
+F <-- R %*% Lambda
+Cov_S <-- Lambda %*% cov(F) %*% Lambda'
+Alpha <-- mean(R) - mean(F) %*% Lambda'
 
+Output: Cov_s, Alpha
+```
 
-The smart alpha portfolio selection algorithm is implemented in R, and then applied to the European stock market on a **rolling-window scheme**:
+Given $\alpha$ and $\Sigma_S$, the optimized weights are solved using [Gurobi R interface](https://www.gurobi.com/documentation/9.5/refman/r_api_overview.html).
+
+The above portfolio selection algorithm is implemented in R, and then applied to the European stock market on a **rolling-window scheme**:
 - Stock Universe: constituents of the **STOXX Europe 600** index, with ticker scrapped from DividendMax and data downloaded from python library [`yfinance`](https://pypi.org/project/yfinance/).
 - Use daily returns from 2015-01 to 2021-12.
 - Window length is 13 months (12 months for training and 1 month for out-of-sample testing), each iteration moves forward by 1 month.
@@ -172,10 +189,11 @@ Users can reproduce or extend my empirical analysis by running the program files
 ---
 
 ## Original Paper
+
 <a id="boucher2021"></a>
-**Boucher, C., Jasinski, A., Kouontchou, P., & Tokpavi, S. (2021).**
-Smart Alpha: active management with unstable and latent factors.
-*Quantitative Finance, 21(6), 893–909.*
+**Boucher, C., Jasinski, A., Kouontchou, P., & Tokpavi, S. (2021).**  
+Smart Alpha: active management with unstable and latent factors.  
+*Quantitative Finance*, 21(6), 893–909.
 
 <a id="zou-2006"></a>
 **Zou, H., Hastie, T., & Tibshirani, R. (2006).**  
