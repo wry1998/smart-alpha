@@ -188,7 +188,7 @@ Users can reproduce or extend my empirical analysis by running the program files
 
 ---
 
-## Original Paper
+## References
 
 <a id="boucher2021"></a>
 **Boucher, C., Jasinski, A., Kouontchou, P., & Tokpavi, S. (2021).**  
