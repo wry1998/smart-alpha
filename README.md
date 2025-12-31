@@ -10,7 +10,7 @@ The main goal of this project is to investigate how **sparsity levels** and othe
 ---
 
 ## Methodology
-Capital Asset Pricing Mondel: 
+Capital Asset Pricing Model: 
 
 $$
 \mathbb{E}[r]^{\text{actual}} 
