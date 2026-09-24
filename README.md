@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains my Master's project, where I implement and study the portfolio selection algorithm introduced in [Boucher et al., 2021](#boucher2021)
+This repository contains my master's research paper, where I implement and study the portfolio selection algorithm introduced in [Boucher et al., 2021](#boucher2021)
 
 The Smart Alpha strategy is applied to the **European stock market (STOXX600)** from **2015-01-01 to 2021-12-31**.  
 The main goal of this project is to investigate how **sparsity levels** and other **hyper-parameters** affect portfolio performance and risk characteristics.
@@ -21,8 +21,8 @@ $$
 The core idea of the Smart Alpha approach is to construct a portfolio that:
 
 - **Minimises exposure to systematic risk ($\beta$)**, while  
-- **Achieving a target level of $\alpha$**, and  
-- **Preserving diversification** through an upper bound on single-stock weights.
+- **Achieving a target level of $\alpha$** and  
+- **Preserving diversification** through an upper bound on the weight of each single stock.
 
 The optimization program is written as follows:
 
@@ -69,9 +69,9 @@ where
 
 - $V(k,\hat F(k)) = \frac{1}{TN} \sum_{i=1}^N \sum_{t=1}^T \hat e_{it}^2,$
 - $C_{TN} = \min(\sqrt{N}, \sqrt{T}),$ and
-- $i=1,...,N$ specifies $N$ stocks , $t=1,...,T$ specifies $T$ returns.
+- $i=1,...,N$ represents $N$ stocks , $t=1,...,T$ represents $T$ returns.
 
-Choose the $k$ that minimizes $IC(k)$ to be the estimate of $m$.
+Choose the $k$ that minimizes $IC(k)$ to be the estimation of $m$.
 
 ---
 
@@ -100,7 +100,7 @@ m_optimal <- m such that the corresponding IC is minimized
 Output: m_optimal
 ```
 
-For a given $m$, Latent factors are estimated by sparse-PCA via a hard-thresholding, and the $\alpha$ and $\Sigma_S$ in the optimization problem follows:
+For a given $m$, latent factors are estimated by sparse-PCA via a hard-thresholding, and the $\alpha$ and $\Sigma_S$ in the optimization problem follows:
 
 ```text
 Input:
@@ -144,11 +144,11 @@ The above portfolio selection algorithm is implemented in R, and then applied to
 
 ## Empirical Findings
 
-Portfolio is evaluated considering: **return**, **volatility**, **Sharpe ratio**, **drawdown in crash periods**, **beta**, **alpha**, **residual risk**, **excess return**, and **appraisal ratio**. Followed [Boucher et al., 2021](#boucher2021),I reproduced the main empiracal results with some additional robustness checks and extensions:
+Portfolio performance is evaluated considering: **return**, **volatility**, **Sharpe ratio**, **drawdown in crash periods**, **beta**, **alpha**, **residual risk**, **excess return**, and **appraisal ratio**. Followed [Boucher et al., 2021](#boucher2021),I reproduced the main empirical results with some additional robustness checks and extensions:
 
 - The optimal number of dynamic factors is typically **2–4**, and this number tends to **increase at the beginning of crisis periods**.
 - **Sparse-PCA** produces significantly better dynamic factors than standard PCA in this setting, although it is more computationally expensive.
-- Sparsity, jointly controlled by the **number of factors** and the **hard-thresholding level**, has a **non-monotonic** effect on performance: as sparsity increases, performance firstly decreases, then improves and reaches to maximum, and finally deteriorates again when the model becomes too sparse.
+- Sparsity, which is jointly controlled by the **number of factors** and the **hard-thresholding level**, has a **non-monotonic** effect on performance: as sparsity increases, performance firstly decreases, then improves and reaches to maximum, and finally deteriorates again when the model becomes too sparse.
 - A “greedy” choice of a high alpha lower bound $\varepsilon$ can lead to **lower realised alpha** out of sample. In my experiments, the best portfolios are often obtained when **alpha is left unconstrained or only mildly constrained**.
 
 ---
@@ -178,10 +178,10 @@ Portfolio is evaluated considering: **return**, **volatility**, **Sharpe ratio**
 └── README.md
 ```
 
-Note, Due to data size, I do **not** distribute the full dataset in this repository. Instead, I provide:
+Note that due to data size, I did not put the full dataset in this repository. Instead, I provide:
 
 - A list of STOXX600 tickers and exchanges,
-- A small example return panel to illustrate the required input format, and
+- A small example of returns to illustrate the required input format, and
 - A Python script that downloads price data from Yahoo Finance using `yfinance`.
   
 Users can reproduce or extend my empirical analysis by running the program files in order with their preferred sample period.
