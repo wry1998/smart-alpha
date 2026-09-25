@@ -2,9 +2,7 @@
 
 ## Overview
 
-This repository contains my master's research paper, where I implemented and studied the portfolio selection algorithm introduced in [Boucher et al., 2021](#boucher2021)
-
-The Smart Alpha strategy is applied to the **European stock market (STOXX600)** from **2015-01-01 to 2021-12-31**.
+This repository contains my master's research paper, where I implemented and studied the portfolio selection algorithm introduced in [Boucher et al., 2021](#boucher2021). This project was supervised by Professor David Saunders.
 
 The main goal of this project was to investigate how **sparsity levels** and other **hyper-parameters** affect portfolio performance and risk characteristics.
 
